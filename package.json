@@ -1,0 +1,32 @@
+{
+    "name": "nyk-cosmetics",
+    "version": "1.0.0",
+    "private": true,
+    "description": "NYK Cosmetics - Sales Order Management System",
+    "scripts": {
+        "dev": "concurrently \"pnpm dev:frontend\" \"pnpm dev:backend\"",
+        "dev:frontend": "pnpm --filter frontend dev",
+        "dev:backend": "pnpm --filter backend start:dev",
+        "build": "pnpm build:shared && pnpm build:frontend && pnpm build:backend",
+        "build:frontend": "pnpm --filter frontend build",
+        "build:backend": "pnpm --filter backend build",
+        "build:shared": "pnpm --filter shared build",
+        "lint": "pnpm -r lint",
+        "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+        "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+        "clean": "pnpm -r clean",
+        "db:generate": "pnpm --filter backend prisma:generate",
+        "db:migrate": "pnpm --filter backend prisma:migrate",
+        "db:push": "pnpm --filter backend prisma:push",
+        "db:studio": "pnpm --filter backend prisma:studio"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2",
+        "prettier": "^3.4.2"
+    },
+    "engines": {
+        "node": ">=18.0.0",
+        "pnpm": ">=8.0.0"
+    },
+    "packageManager": "pnpm@9.2.0+sha512.98a80fd11c2e7096747762304106432b3ddc67dcf54b5a8c01c93f68a2cd5e05e6821849522a06fb76284d41a2660d5e334f2ee3bbf29183bf2e739b1dafa771"
+}

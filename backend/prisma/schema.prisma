@@ -1,0 +1,140 @@
+// Prisma Schema for NYK Cosmetics
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// User Model
+// ==========================================
+
+enum UserRole {
+  admin
+  salesperson
+  regional_sales
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(salesperson)
+  phone     String?
+  region    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  orders        Order[]  @relation("SalespersonOrders")
+  approvedOrders Order[] @relation("ApprovedOrders")
+
+  @@map("users")
+}
+
+// ==========================================
+// Shop Model
+// ==========================================
+
+model Shop {
+  id            String   @id @default(cuid())
+  name          String
+  address       String
+  phone         String
+  region        String?
+  contactPerson String?
+  email         String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  orders Order[]
+
+  @@map("shops")
+}
+
+// ==========================================
+// Product Model
+// ==========================================
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  sku         String   @unique
+  price       Float
+  stock       Int      @default(0)
+  unit        String
+  description String?
+  imageUrl    String?
+  category    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  orderItems OrderItem[]
+
+  @@map("products")
+}
+
+// ==========================================
+// Order Model
+// ==========================================
+
+enum OrderStatus {
+  pending
+  approved
+  rejected
+  completed
+  cancelled
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  orderNumber  String      @unique
+  totalAmount  Float
+  status       OrderStatus @default(pending)
+  notes        String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  approvedAt   DateTime?
+
+  // Relations
+  shop          Shop        @relation(fields: [shopId], references: [id])
+  shopId        String
+  salesperson   User        @relation("SalespersonOrders", fields: [salespersonId], references: [id])
+  salespersonId String
+  approvedBy    User?       @relation("ApprovedOrders", fields: [approvedById], references: [id])
+  approvedById  String?
+  items         OrderItem[]
+
+  @@map("orders")
+}
+
+// ==========================================
+// OrderItem Model
+// ==========================================
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  quantity  Int
+  price     Float
+  subtotal  Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+
+  @@map("order_items")
+}
