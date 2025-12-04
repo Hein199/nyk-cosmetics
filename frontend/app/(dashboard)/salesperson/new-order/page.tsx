@@ -81,7 +81,7 @@ export default function ShopSelectionPage() {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 bg-[#FFCDC9] min-h-screen p-6 rounded-lg">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>

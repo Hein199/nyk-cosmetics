@@ -23,9 +23,10 @@ const adminNavItems = [
 
 const salespersonNavItems = [
     { href: "/salesperson", label: "Dashboard", icon: "home" },
-    { href: "/salesperson/new-order", label: "New Order", icon: "plus" },
-    { href: "/salesperson/orders", label: "My Orders", icon: "orders" },
-    { href: "/salesperson/shops", label: "My Shops", icon: "shops" },
+    { href: "/salesperson/orders", label: "Orders", icon: "orders" },
+    { href: "/salesperson/products", label: "Products", icon: "products" },
+    { href: "/salesperson/customers", label: "Customers", icon: "customers" },
+    { href: "/salesperson/account", label: "My Account", icon: "account" },
 ];
 
 const icons: Record<string, React.ReactNode> = {
@@ -68,6 +69,21 @@ const icons: Record<string, React.ReactNode> = {
     plus: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+    ),
+    customers: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+    ),
+    account: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+    ),
+    logout: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
     ),
 };
@@ -283,7 +299,7 @@ export default function DashboardLayout({
                 </header>
 
                 {/* Page content */}
-                <main className="p-4 lg:p-6">
+                <main className="p-4 lg:p-6 bg-[#FFCDC9] min-h-screen">
                     {children}
                 </main>
             </div>
