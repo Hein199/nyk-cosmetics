@@ -54,3 +54,5 @@ prisma/migrations/**/migration_lock.toml
 
 # OS
 Thumbs.db
+
+.github/copilot-instructions.md
