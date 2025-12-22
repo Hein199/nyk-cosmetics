@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/lib/cart-context";
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -217,6 +218,11 @@ export default function DashboardLayout({
 
                         {/* Right side items */}
                         <div className="flex items-center gap-2">
+                            {/* Cart Button - Only for salesperson */}
+                            {userRole === "salesperson" && (
+                                <CartButton />
+                            )}
+
                             {/* Notifications */}
                             <button className="p-2 rounded-full hover:bg-gray-100 relative">
                                 <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -304,5 +310,27 @@ export default function DashboardLayout({
                 </main>
             </div>
         </div>
+    );
+}
+
+// Cart Button Component for Salesperson
+function CartButton() {
+    const { cartSummary } = useCart();
+
+    return (
+        <Link href="/salesperson/cart">
+            <button 
+                className="p-2 rounded-full hover:bg-gray-100 relative"
+            >
+                <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6H19" />
+                </svg>
+                {cartSummary.itemCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-pink-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        {cartSummary.itemCount}
+                    </span>
+                )}
+            </button>
+        </Link>
     );
 }

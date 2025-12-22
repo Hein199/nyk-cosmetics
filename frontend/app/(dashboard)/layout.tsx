@@ -1,4 +1,5 @@
 import DashboardLayoutComponent from "@/components/layouts/DashboardLayout";
+import { CartProvider } from "@/lib/cart-context";
 
 export default function DashboardLayout({
     children,
@@ -6,8 +7,10 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     return (
-        <DashboardLayoutComponent userRole="salesperson" userName="Thiri">
-            {children}
-        </DashboardLayoutComponent>
+        <CartProvider>
+            <DashboardLayoutComponent userRole="salesperson" userName="Thiri">
+                {children}
+            </DashboardLayoutComponent>
+        </CartProvider>
     );
 }

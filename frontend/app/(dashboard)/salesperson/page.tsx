@@ -83,7 +83,6 @@ const monthlyTargets: Record<string, { target: number; achieved: number }> = {
 
 const statusColors: Record<string, string> = {
     completed: "bg-green-100 text-green-800",
-    pending: "bg-yellow-100 text-yellow-800",
     processing: "bg-blue-100 text-blue-800",
     cancelled: "bg-red-100 text-red-800",
 };
@@ -123,7 +122,6 @@ export default function SalespersonPage() {
     const dayStats = useMemo(() => {
         const totalOrders = filteredOrders.length;
         const completedOrders = filteredOrders.filter(o => o.status === "completed").length;
-        const pendingOrders = filteredOrders.filter(o => o.status === "pending").length;
         const processingOrders = filteredOrders.filter(o => o.status === "processing").length;
         const cancelledOrders = filteredOrders.filter(o => o.status === "cancelled").length;
         const totalSales = filteredOrders
@@ -133,7 +131,6 @@ export default function SalespersonPage() {
         return {
             totalOrders,
             completedOrders,
-            pendingOrders,
             processingOrders,
             cancelledOrders,
             totalSales
@@ -424,36 +421,6 @@ export default function SalespersonPage() {
                                         strokeLinejoin="round"
                                         strokeWidth={2}
                                         d="M5 13l4 4L19 7"
-                                    />
-                                </svg>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardContent className="pt-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-gray-500">
-                                    Pending
-                                </p>
-                                <p className="text-3xl font-bold text-yellow-600 mt-1">
-                                    {dayStats.pendingOrders}
-                                </p>
-                            </div>
-                            <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                                <svg
-                                    className="w-6 h-6 text-yellow-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                                     />
                                 </svg>
                             </div>

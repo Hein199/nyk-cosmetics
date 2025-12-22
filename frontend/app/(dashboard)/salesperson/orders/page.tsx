@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 const mockOrders = [
     // Current date orders (December 2025) 
     { id: "ORD-001", customer: "Beauty Store A", amount: 125000, status: "completed", date: "2025-12-05", time: "10:30 AM", items: 5, salesperson: "Thiri" },
-    { id: "ORD-002", customer: "Cosmetics Shop B", amount: 89000, status: "pending", date: "2025-12-05", time: "02:15 PM", items: 3, salesperson: "Thiri" },
+
     { id: "ORD-003", customer: "Modern Salon", amount: 156000, status: "processing", date: "2025-12-05", time: "04:20 PM", items: 4, salesperson: "Thiri" },
     
     // Recent past dates (December 2025)
@@ -29,24 +29,23 @@ const mockOrders = [
     // March 2025 orders
     { id: "ORD-009", customer: "Glam Studio G", amount: 195000, status: "completed", date: "2025-03-08", time: "01:15 PM", items: 6, salesperson: "Thiri" },
     { id: "ORD-010", customer: "Style Shop H", amount: 267000, status: "completed", date: "2025-03-08", time: "05:45 PM", items: 9, salesperson: "Thiri" },
-    { id: "ORD-011", customer: "Beauty Haven I", amount: 134000, status: "pending", date: "2025-03-07", time: "10:00 AM", items: 5, salesperson: "Thiri" },
+
     { id: "ORD-012", customer: "Charm Boutique J", amount: 198000, status: "cancelled", date: "2025-03-06", time: "02:30 PM", items: 6, salesperson: "Thiri" },
     { id: "ORD-013", customer: "Elite Beauty K", amount: 445000, status: "completed", date: "2025-03-05", time: "11:15 AM", items: 8, salesperson: "Thiri" },
     
     // November 2024 orders
     { id: "ORD-014", customer: "Beauty Central M", amount: 178000, status: "completed", date: "2024-11-30", time: "09:30 AM", items: 5, salesperson: "Thiri" },
     { id: "ORD-015", customer: "Glamour Point N", amount: 256000, status: "completed", date: "2024-11-29", time: "01:45 PM", items: 7, salesperson: "Thiri" },
-    { id: "ORD-016", customer: "Style Center O", amount: 89000, status: "pending", date: "2024-11-28", time: "03:20 PM", items: 3, salesperson: "Thiri" },
+
     
     // October 2024 orders
     { id: "ORD-017", customer: "Beauty World P", amount: 167000, status: "completed", date: "2024-10-15", time: "10:15 AM", items: 4, salesperson: "Thiri" },
     { id: "ORD-018", customer: "Cosmetic Hub Q", amount: 298000, status: "completed", date: "2024-10-15", time: "02:30 PM", items: 8, salesperson: "Thiri" },
-    { id: "ORD-019", customer: "Style Palace R", amount: 123000, status: "pending", date: "2024-10-14", time: "11:45 AM", items: 3, salesperson: "Thiri" },
+
 ];
 
 const statusColors: Record<string, string> = {
     completed: "bg-green-100 text-green-800",
-    pending: "bg-yellow-100 text-yellow-800",
     processing: "bg-blue-100 text-blue-800",
     cancelled: "bg-red-100 text-red-800",
 };
@@ -54,7 +53,6 @@ const statusColors: Record<string, string> = {
 const statusOptions = [
     { value: "all", label: "All Orders" },
     { value: "completed", label: "Completed" },
-    { value: "pending", label: "Pending" },
     { value: "processing", label: "Processing" },
     { value: "cancelled", label: "Cancelled" },
 ];
@@ -117,10 +115,9 @@ export default function OrdersPage() {
     const orderStats = useMemo(() => {
         const total = mockOrders.length;
         const completed = mockOrders.filter(o => o.status === "completed").length;
-        const pending = mockOrders.filter(o => o.status === "pending").length;
         const processing = mockOrders.filter(o => o.status === "processing").length;
         
-        return { total, completed, pending, processing };
+        return { total, completed, processing };
     }, []);
 
     return (
@@ -148,7 +145,7 @@ export default function OrdersPage() {
             </div>
 
             {/* Stats Summary */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Card>
                     <CardContent className="pt-6">
                         <div className="flex items-center justify-between">
@@ -185,23 +182,7 @@ export default function OrdersPage() {
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardContent className="pt-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-gray-500">Pending</p>
-                                <p className="text-3xl font-bold text-yellow-600 mt-1">
-                                    {orderStats.pending}
-                                </p>
-                            </div>
-                            <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+
 
                 <Card>
                     <CardContent className="pt-6">

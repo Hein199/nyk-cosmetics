@@ -10,6 +10,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { INVENTORY_UNITS } from "@/lib/constants";
+import { useCart } from "@/lib/cart-context";
 
 // Mock customer data
 const mockCustomers = [
@@ -120,12 +121,22 @@ function formatCurrency(amount: number) {
 export default function ProductsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("all");
-    const [cart, setCart] = useState<CartItem[]>([]);
-    const [selectedCustomer, setSelectedCustomer] = useState("");
-    const [customerSearch, setCustomerSearch] = useState("");
     const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
     
     const customerDropdownRef = useRef<HTMLDivElement>(null);
+    
+    // Use global cart context
+    const {
+        cart,
+        selectedCustomer,
+        customerSearch,
+        addToCart,
+        removeFromCart,
+        clearCart,
+        setSelectedCustomer,
+        setCustomerSearch,
+        cartSummary
+    } = useCart();
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -173,69 +184,39 @@ export default function ProductsPage() {
         return mockCustomers.find(c => c.id === selectedCustomer);
     }, [selectedCustomer]);
 
-    // Calculate totals
-    const cartSummary = useMemo(() => {
-        const subtotal = cart.reduce((sum, item) => sum + item.total, 0);
-        const total = subtotal; // No tax applied
-        
-        return { subtotal, total, itemCount: cart.length };
-    }, [cart]);
-
-    // Add to cart function
-    const addToCart = (productId: string, quantity: number, unit: string, customPrice?: number) => {
+    // Local add to cart function that uses global context
+    const localAddToCart = (productId: string, quantity: number, unit: string, customPrice?: number) => {
         const product = mockProducts.find(p => p.id === productId);
         if (!product || quantity <= 0) return;
 
-        const finalPrice = customPrice !== undefined ? customPrice : product.price;
-        const existingItemIndex = cart.findIndex(item => 
-            item.id === productId && item.unit === unit && 
-            (item.customPrice || item.price) === finalPrice
-        );
-
-        const itemTotal = finalPrice * quantity;
-
-        if (existingItemIndex >= 0) {
-            // Update existing item
-            const updatedCart = [...cart];
-            updatedCart[existingItemIndex].quantity += quantity;
-            updatedCart[existingItemIndex].total = updatedCart[existingItemIndex].quantity * finalPrice;
-            setCart(updatedCart);
-        } else {
-            // Add new item
-            const newItem: CartItem = {
-                id: productId,
-                name: product.name,
-                price: product.price,
-                customPrice: customPrice,
-                quantity,
-                unit,
-                total: itemTotal
-            };
-            setCart([...cart, newItem]);
-        }
-    };
-
-    // Remove from cart
-    const removeFromCart = (index: number) => {
-        const updatedCart = cart.filter((_, i) => i !== index);
-        setCart(updatedCart);
-    };
-
-    // Clear cart
-    const clearCart = () => {
-        setCart([]);
+        addToCart(productId, quantity, unit, customPrice, product.name, product.price);
     };
 
     return (
-        <div className="flex min-h-screen">
-            {/* Left Sidebar - Receipt */}
-            <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
-                {/* Receipt Header */}
-                <div className="p-4 border-b border-gray-200">
-                    <h2 className="text-lg font-semibold text-gray-900">Order Receipt</h2>
-                    
-                    {/* Customer Selection */}
-                    <div className="mt-3">
+        <div className="min-h-screen bg-[#FFCDC9] p-6">
+            <div className="max-w-7xl mx-auto space-y-6">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900">Products</h1>
+                        <p className="text-gray-600 mt-1">Select products and customer to add to cart</p>
+                    </div>
+                    {cart.length > 0 && (
+                        <div className="text-right">
+                            <div className="text-sm text-gray-600">
+                                {cartSummary.itemCount} items in cart
+                            </div>
+                            <div className="text-lg font-semibold text-gray-900">
+                                Total: {formatCurrency(cartSummary.total)}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Customer Selection Card */}
+                <Card className="bg-white p-6">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Select Customer</h2>
+                    <div className="max-w-md">
                         <label className="block text-sm font-medium text-gray-900 mb-2">
                             Customer
                         </label>
@@ -279,107 +260,14 @@ export default function ProductsPage() {
                         
                         {/* Selected Customer Display */}
                         {selectedCustomerDetails && (
-                            <div className="mt-2 p-2 bg-pink-50 border border-pink-200 rounded-md">
+                            <div className="mt-2 p-3 bg-pink-50 border border-pink-200 rounded-md">
                                 <div className="text-sm font-medium text-gray-900">{selectedCustomerDetails.name}</div>
                                 <div className="text-xs text-gray-800">{selectedCustomerDetails.phone}</div>
                                 <div className="text-xs text-gray-700 truncate">{selectedCustomerDetails.address}</div>
                             </div>
                         )}
                     </div>
-                </div>
-
-                {/* Cart Items */}
-                <div className="flex-1 overflow-y-auto p-4">
-                    {cart.length === 0 ? (
-                        <div className="text-center py-8">
-                            <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                                <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                </svg>
-                            </div>
-                            <p className="text-gray-800 text-sm">No items in cart</p>
-                            <p className="text-gray-700 text-xs mt-1">Add products to create an order</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-3">
-                            {cart.map((item, index) => (
-                                <div key={`${item.id}-${item.unit}-${index}`} className="bg-gray-50 rounded-lg p-3">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <h4 className="text-sm font-medium text-gray-900 line-clamp-2">
-                                                {item.name}
-                                            </h4>
-                                            <div className="mt-1 text-xs text-gray-700">
-                                                <span className="text-black font-semibold">{item.quantity}</span> {item.unit} × <span className="text-black font-semibold">{formatCurrency(item.customPrice || item.price)}</span>
-                                                {item.customPrice && (
-                                                    <span className="ml-1 text-orange-800 font-medium">(Custom)</span>
-                                                )}
-                                            </div>
-                                            {item.customPrice && (
-                                                <div className="mt-1 text-xs text-gray-600">
-                                                    Original: <span className="text-black font-semibold">{formatCurrency(item.price)}</span>
-                                                </div>
-                                            )}
-                                            <div className="mt-1 text-sm font-medium text-black">
-                                                {formatCurrency(item.total)}
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={() => removeFromCart(index)}
-                                            className="ml-2 text-red-500 hover:text-red-700"
-                                        >
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
-                {/* Receipt Summary */}
-                {cart.length > 0 && (
-                    <div className="border-t border-gray-200 p-4 bg-gray-50">
-                        <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                                <span className="text-gray-800">Subtotal (<span className="text-black font-semibold">{cartSummary.itemCount}</span> items)</span>
-                                <span className="font-medium text-black">{formatCurrency(cartSummary.subtotal)}</span>
-                            </div>
-                            <div className="border-t border-gray-300 pt-2">
-                                <div className="flex justify-between">
-                                    <span className="font-semibold text-gray-900">Total</span>
-                                    <span className="font-bold text-lg text-black">{formatCurrency(cartSummary.total)}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="mt-4 space-y-2">
-                            <Button 
-                                className="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700"
-                                disabled={!selectedCustomer || cart.length === 0}
-                            >
-                                {!selectedCustomer ? 'Select Customer First' : 'Create Order'}
-                            </Button>
-                            <Button 
-                                variant="outline" 
-                                className="w-full"
-                                onClick={clearCart}
-                            >
-                                Clear Cart
-                            </Button>
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* Main Content - Products */}
-            <div className="flex-1 p-6">
-                {/* Header */}
-                <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900">Products</h1>
-                    <p className="text-gray-800 mt-1">Select products to create a new order</p>
-                </div>
+                </Card>
 
                 {/* Filters */}
                 <div className="mb-6 flex flex-col sm:flex-row gap-4">
@@ -412,7 +300,7 @@ export default function ProductsPage() {
                         <ProductCard
                             key={product.id}
                             product={product}
-                            onAddToCart={addToCart}
+                            onAddToCart={localAddToCart}
                         />
                     ))}
                 </div>
